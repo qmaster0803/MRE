@@ -5,7 +5,7 @@ INCLUDE_LIBS  =$(shell pkg-config --libs   gtk+-3.0)
 
 all: main.o
 	@echo "[LINK] all"
-	@g++ $(INCLUDE_CFLAGS) main.o $(INCLUDE_LIBS) -rdynamic -o main
+	@g++ $(INCLUDE_CFLAGS) main.o $(INCLUDE_LIBS) -rdynamic -o main.out
 
 main.o: main.cc gtk_layout.h gtk_css.h
 	@echo "[ CC ] main.cc"
