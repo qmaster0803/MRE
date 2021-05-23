@@ -2,6 +2,9 @@
 #include "gtk_layout.h"
 #include "gtk_css.h"
 
+#include "dev_options.h"
+
+#include <vector>
 #include <iostream>
 
 GtkWidget* create_window()
@@ -31,11 +34,17 @@ GtkWidget* create_window()
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_USER); //applying css to all widgets
 
     g_object_unref(builder);
+
+    std::string window_title(WINDOW_NAME);
+    window_title.append(" ");
+    window_title.append(VERSION);
+    gtk_window_set_title((GtkWindow*)window, window_title.c_str());
     return window;
 }
 
 void add_class_block(GtkBox* classes_box)
 {
+    static ulong class_id = 0;
     GtkWidget *box_new;
     GtkWidget *button_class;
     GtkWidget *button_delete;
@@ -44,21 +53,26 @@ void add_class_block(GtkBox* classes_box)
     delete_icon = gtk_image_new_from_file("delete_icon.png");
 
     box_new = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    button_class = gtk_button_new_with_label("Class name here");
+
+    std::string buf("Class ");
+    buf.append(std::to_string(class_id));
+    button_class = gtk_button_new_with_label(buf.c_str());
+
     button_delete = gtk_button_new();
     gtk_button_set_image((GtkButton*)button_delete, delete_icon);
 
     gtk_widget_set_size_request(button_class, 150, -1);
-    gtk_widget_set_size_request(button_delete, 50, -1);
+    gtk_widget_set_size_request(button_delete, 45, -1);
 
     gtk_box_pack_start((GtkBox*)box_new, button_class, true, false, 0);
     gtk_box_pack_end((GtkBox*)box_new, button_delete, true, false, 0);
 
-    gtk_box_pack_end(classes_box, box_new, true, false, 0);
+    gtk_box_pack_start(classes_box, box_new, true, false, 0);
 
     gtk_widget_show(box_new);
     gtk_widget_show(button_class);
     gtk_widget_show(button_delete);
+    class_id++;
 }
 
 void add_properties_block(GtkBox* properties_box)
@@ -66,6 +80,7 @@ void add_properties_block(GtkBox* properties_box)
     GtkWidget *box_new;
     GtkWidget *combobox_new;
     GtkWidget *textview_new;
+    GtkWidget *separator_new;
 
     box_new = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
@@ -78,17 +93,27 @@ void add_properties_block(GtkBox* properties_box)
     textview_new = gtk_text_view_new();
     gtk_widget_set_size_request(textview_new, -1, 150);
 
+    separator_new = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+    GtkStyleContext *context;
+    context = gtk_widget_get_style_context(separator_new);
+    gtk_style_context_add_class(context, "propertiesSeparator"); //add class to use css
+
     gtk_box_pack_start((GtkBox*)box_new, combobox_new, true, false, 0);
     gtk_box_pack_end((GtkBox*)box_new, textview_new, true, false, 0);
 
-    gtk_box_pack_end(properties_box, box_new, true, false, 0);
+    gtk_box_pack_start(properties_box, box_new, true, false, 0);
+    gtk_box_pack_start(properties_box, separator_new, true, false, 0);
 
     gtk_widget_show(box_new);
     gtk_widget_show(combobox_new);
     gtk_widget_show(textview_new);
+    gtk_widget_show(separator_new);
 }
 
 GtkWidget *window;
+// TODO
+//std::vector<GtkWidget*> g_class_buttons;
+//std::vector<GtkWidget*> g_class_delete_buttons;
 
 int main(int argc, char *argv[])
 {
@@ -135,4 +160,5 @@ void define_paned_position_limits(GtkWidget *paned)
     {
         gtk_paned_set_position((GtkPaned*)paned, window_width-400);
     }
+    //gtk_widget_set_size_request(button_class, gtk_paned_get_position((GtkPaned*)paned)-50, -1);
 }
