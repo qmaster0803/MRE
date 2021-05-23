@@ -33,6 +33,7 @@
 
 # Glade system files
 *.glade~
+\#*.glade\#
 
 # Auto-created headers (xxd in makefile)
 gtk_css.h
